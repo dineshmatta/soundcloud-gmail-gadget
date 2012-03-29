@@ -1,9 +1,8 @@
-/*!
+/*
  * SoundCloud Gmail Gadget
  * [https://github.com/soundcloudlabs/soundcloud-gmail-gadget](https://github.com/soundcloudlabs/soundcloud-gmail-gadget)
  *
- * Copyright 2011, SoundCloud Ltd., Tobias Bielohlawek
- * Licensed under the BSD license.
+ * Copyright 2012, SoundCloud Ltd., Tobias Bielohlawek
  *
  */
 gadget = function ($, styleUrl) {
@@ -22,25 +21,10 @@ gadget = function ($, styleUrl) {
    * Attach the gadget
    */
   attachGadget = function ($player) {
-    $player
-    .append( $('<div class="sc-gadget"><div class="head"><b>SoundCloud</b> - Sounds from this email</div><div class="body"><a href="" class="show">Show more</a><a href="">Hide</a></div></div>') )
-    .find('.sc-gadget .body').inlinePlayer( matches,
-      { https: true,
-        callback: function (list) {
-          var cnt = $player.find('li').length;
-          $player.find('li').css('margin-left', 0).slice(0,3).show();
-          if( cnt > 3 ) {
-            $player.find('a').click( function(e) {
-                $player.find('li').slice(3).add($player.find('a')).toggle();
-                return false;
-            })
-           .filter('.show')
-           .html('Show ' + (cnt - 3) + ' more')
-           .show();
-          }
-        }
-      }
-    );
+    $player.append( $('<div class="sc-gadget"><div class="title"><b>SoundCloud</b> - Sounds from this email</div>') );
+    $('<div></div>').appendTo($player).gadgetize({
+      urls: matches
+    });
   },
 
   /**
@@ -64,7 +48,7 @@ gadget = function ($, styleUrl) {
   };
 
   $(document).bind('DOMSubtreeModified', function () {
-    //we need to lock here, otherwise it'll triggered by our own changes
+    //we need to lock here, otherwise it'll be triggered by our own changes
     if(!locked) {
       locked = true;
       init();
@@ -72,5 +56,4 @@ gadget = function ($, styleUrl) {
       locked = false;
     }
   });
-
 };

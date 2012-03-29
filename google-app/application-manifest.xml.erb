@@ -18,7 +18,7 @@
   <Extension id="linkExtractor" type="contextExtractor">
     <Name>Link Extractor</Name>
     <Url>google.com:HttpLinkExtractor</Url>
-    <Param name="url" value="<%= ApplicationManifestPattern::get %>"/>
+    <Param name="url" value="^(https?:\/\/)?(snd.sc\/|(www.)?soundcloud.com\/).*$"/>
     <Triggers ref="SoundCloudGadget"/>
     <Scope ref="emailSubject"/>
     <Scope ref="emailBody"/>
