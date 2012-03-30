@@ -3,7 +3,7 @@ require 'rake'
 VENDOR_JS_FILES = %w(http://code.jquery.com/jquery-1.7.2.min.js https://raw.github.com/rngtng/soundcloud-widgetify/master/sc-widgetify.js)
 TITLE           = "SoundCloud Sounds in Google Mail\\u2122"
 VERSION         = File.open('VERSION').read.strip
-DESCRIPTION     = "Show SoundCloud Widget in Google Mail\\u2122 for every URL within the email"
+DESCRIPTION     = "Show SoundCloud Widget for any sound url in Google Mail\\u2122"
 
 def vendor_js_files
   VENDOR_JS_FILES.map do |file|
