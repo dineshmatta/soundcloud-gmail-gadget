@@ -14,28 +14,21 @@ def vendor_js_files
   end
 end
 
-def merge(in_files, out_file, minify = false)
-  if minify
-    "juicer -q merge -s -f -o #{out_file} #{Array(in_files).join(' ')}"
-  else
-    "cat #{Array(in_files).join(' ')} > #{out_file}"
-  end
+def merge(in_files, out_file)
+  "cat #{Array(in_files).join(' ')} > #{out_file}"
 end
 
-def build_gadget(js_files, css_files, out_file)
+def build_gadget(js_files, css_files)
   sh <<-END
-    mkdir -p #{File.dirname(out_file)}
     #{merge(js_files, "javascripts.js")}
-    echo "@javascripts = File.open('javascripts.js').read" >> gadget.rb
-
     #{merge(css_files, "styles.css")}
-    echo "@styles = File.open('styles.css').read" >> gadget.rb
-
-    erubis -E PrintOut -l ruby google-app/gadget.html.erb  >> gadget.rb
-    ruby gadget.rb > #{out_file}
-
-    rm -f javascripts.js styles.css gadget.rb
   END
+
+  @javascripts = File.read('javascripts.js')
+  @styles = File.read('styles.css')
+  sh "rm -f javascripts.js styles.css"
+
+  ERB.new(File.read("google-app/gadget.html.erb")).result
 end
 
 def cfx(command)
@@ -58,7 +51,11 @@ namespace :example do
 
   desc "Build the Example file"
   task :build => :prepare do
-    build_gadget @js_files, @css_files, "#{@out_path}/gadget.html"
+    `mkdir -p #{@out_path}`
+
+    File.open("#{@out_path}/gadget.html", "w") do |file|
+      file.write build_gadget(@js_files, @css_files)
+    end
 
     puts <<-END
       \n\nRun with:
@@ -78,26 +75,21 @@ namespace 'google-app' do
 
   desc "Build the gadget and the xml files"
   task :build => :prepare do
-    build_gadget @js_files, @css_files, "gadget.html"
+    `mkdir -p #{@out_path}`
 
-    sh <<-END
-      mkdir -p #{@out_path}
-      echo "@title = '#{TITLE}';@version = '#{VERSION}';@description = '#{DESCRIPTION}'" > gadget.rb
-      erubis -E DeleteIndent,PrintOut -l ruby #{@in_path}/application-manifest.xml.erb >> gadget.rb
-      ruby gadget.rb > #{@out_path}/application-manifest.xml
+    File.open("#{@out_path}/gadget.xml", "w") do |file|
+      @gadget = build_gadget(@js_files, @css_files)
+      file.write ERB.new(File.read("#{@in_path}/gadget.xml.erb")).result
+    end
 
-      echo "@title = '#{TITLE}';@version = '#{VERSION}';@description = '#{DESCRIPTION}'" > gadget.rb
-      echo "@gadget = File.open('gadget.html').read" >> gadget.rb
-      erubis -E PrintOut -l ruby #{@in_path}/gadget.xml.erb >> gadget.rb
-      ruby gadget.rb > #{@out_path}/gadget.xml
-
-      rm -f gadget.rb gadget.html
-    END
+    File.open("#{@out_path}/application-manifest.xml", "w") do |file|
+      file.write ERB.new(File.read("#{@in_path}/application-manifest.xml.erb")).result
+    end
   end
 end
 
 
-namespace 'chrome' do
+namespace :chrome do
   task :prepare do |task|
     @in_path   = task.scope.last
     @out_path  = "build/#{@in_path}"
@@ -109,8 +101,8 @@ namespace 'chrome' do
   task :build => :prepare do
     sh <<-END
       mkdir -p #{@out_path}
-      #{merge(@js_files, "#{@out_path}/javascripts.js", true)}
-      #{merge(@css_files, "#{@out_path}/styles.css", true)}
+      #{merge(@js_files, "#{@out_path}/javascripts.js")}
+      #{merge(@css_files, "#{@out_path}/styles.css")}
       cp assets/logo* #{@out_path}/
     END
 
@@ -119,13 +111,13 @@ namespace 'chrome' do
     end
   end
 
-  task :release => :prepare do
+  task :release => :build do
     sh "zip -r build/chrome-extension.zip #{@out_path}/"
   end
 end
 
 
-namespace 'firefox' do
+namespace :firefox do
   task :prepare do |task|
     @in_path   = task.scope.last
     @out_path  = "build/#{@in_path}"
@@ -140,30 +132,31 @@ namespace 'firefox' do
       mkdir -p #{@out_path}/data
       #{merge(@js_files, "#{@out_path}/data/javascripts.js")}
       #{merge(@css_files, "#{@out_path}/data/styles.css")}
-      echo "@title = '#{TITLE}';@version = '#{VERSION}';@description = '#{DESCRIPTION}'" > gadget.rb
-      erubis -E PrintOut -l ruby #{@in_path}/package.json.erb >> gadget.rb
-      ruby gadget.rb > #{@out_path}/package.json
       cp #{@in_path}/main.js #{@out_path}/lib
       cp assets/logo-48.png #{@out_path}/icon.png
-      rm -f gadget.rb
     END
+
+    File.open("#{@out_path}/package.json", "w") do |file|
+      file.write ERB.new(File.read("#{@in_path}/package.json.erb")).result
+    end
+
     vendor_js_files.each do |file|
       sh "cp #{file} #{@out_path}/data/"
     end
   end
 
-  task :release => :prepare do
+  task :release => :build do
     cfx "--pkgdir=#{@out_path} xpi"
     sh <<-END
       mv soundcloud-gmail-firefox-extension.xpi build/firefox-extension.xpi
     END
   end
 
-  task :test => :prepare do
+  task :test => :build do
     cfx "--pkgdir=#{@out_path} test"
   end
 
-  task :run => :prepare do
+  task :run => :build do
     cfx "--pkgdir=#{@out_path} run"
   end
 end
@@ -176,16 +169,16 @@ end
 
 desc "Build all"
 task :build_all => :clean do
-  Rake::Task["google-app:build"].execute
-  Rake::Task["chrome:build"].execute
-  Rake::Task["firefox:build"].execute
+  Rake::Task["google-app:build"].invoke
+  Rake::Task["chrome:build"].invoke
+  Rake::Task["firefox:build"].invoke
 end
 
 desc "Release all"
-task :release_all => :build_all do
-  #Rake::Task["google-app:release"].execute - NOTHING to do
-  Rake::Task["chrome:release"].execute
-  Rake::Task["firefox:release"].execute
+task :release_all do
+  Rake::Task["google-app:build"].invoke
+  Rake::Task["chrome:release"].invoke
+  Rake::Task["firefox:release"].invoke
 end
 
 desc "Deploys gadget to live branch"
@@ -203,7 +196,9 @@ task :deploy => :build_all do
     cp LICENSE VERSION CHANGES.md build/
     git checkout --track -b build origin/build
     git checkout build
-    rm -rf *extension*
+    rm -rf chrome
+    rm -rf firefox
+    rm -rf example
     rm -rf google-app
     mv -f build/* .
     git commit -a --allow-empty -m 'Release #{VERSION}'

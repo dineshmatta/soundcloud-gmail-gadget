@@ -5,36 +5,27 @@
  * Copyright 2012, SoundCloud Ltd., Tobias Bielohlawek
  *
  */
-gadget = function ($, styleUrl) {
-  // only act in Conent Frame
+gadget = function ($) {
+  // only act in Content Frame
   if (!window.frameElement || window.frameElement.id !== 'canvas_frame') {
     return;
   }
-
-  // attach styling
-  $('<link rel="stylesheet" type="text/css" />').attr('href', styleUrl).appendTo($('head'));
 
   var regexpURL =/(https?:\/\/)?(snd.sc\/[^\/]+|(www.)?soundcloud.com\/)[^ <'"\n]+/ig,
   locked = false,
 
   /**
-   * Attach the gadget
-   */
-  attachGadget = function ($player) {
-    $player.append( $('<div class="sc-gadget"><div class="title"><b>SoundCloud</b> - Sounds from this email</div>') );
-    $('<div></div>').appendTo($player).gadgetize({
-      urls: matches
-    });
-  },
-
-  /**
    * Find urls and kick off attach process
    */
   init = function () {
-    $('.ii.gt:not(.sc-checked)').each(function () {
-      if( (matches = $(this).addClass('.sc-checked').html().match(regexpURL)) && matches.length > 0 ) {
+    $('.ii.gt.adP.adO:not(.sc-checked)').each(function () {
+      var matches = $(this).addClass('sc-checked').html().replace(/<\/?w?br>/g,"").match(regexpURL);
+      if( matches && matches.length > 0 ) {
         $(this).parent().parent().find('.hi:first:empty').each( function () {
-          attachGadget($(this));
+          $(this).gadgetize({
+            addTitle: true,
+            urls: matches
+          });
         });
       }
     });
@@ -48,6 +39,7 @@ gadget = function ($, styleUrl) {
   };
 
   $(document).bind('DOMSubtreeModified', function () {
+    // attach styling
     //we need to lock here, otherwise it'll be triggered by our own changes
     if(!locked) {
       locked = true;
