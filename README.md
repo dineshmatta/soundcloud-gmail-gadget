@@ -30,7 +30,7 @@ Some useful pages for developing the gadget:
 - [Apply for custom extractors](http://developer.googleapps.com/preview)
 
 ### Firefox Add-on (Jetpack)
-- [Developers SDK Announcement](http://blog.mozilla.com/addons/2011/05/05/announcing-add-on-sdk-1-0b5/)
+- [Get the SDK](https://addons.mozilla.org/en-US/developers/tools/builder)
 
 ### Chrome Extension
 - [Developers Guide](http://code.google.com/chrome/extensions/devguide.html)
@@ -57,3 +57,6 @@ We'll do our best to help you out with any contribution issues you may have.
 
 The license is included as LICENSE in this directory.
 
+
+
+- [Developers SDK Announcement](http://blog.mozilla.com/addons/2011/05/05/announcing-add-on-sdk-1-0b5/)

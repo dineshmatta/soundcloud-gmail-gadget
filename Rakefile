@@ -1,4 +1,5 @@
 require 'rake'
+require 'erb'
 
 VENDOR_JS_FILES = %w(http://code.jquery.com/jquery-1.7.2.min.js https://raw.github.com/rngtng/soundcloud-widgetify/master/sc-widgetify.js)
 TITLE           = "SoundCloud Sounds in Google Mail\\u2122"
@@ -110,12 +111,12 @@ namespace 'chrome' do
       mkdir -p #{@out_path}
       #{merge(@js_files, "#{@out_path}/javascripts.js", true)}
       #{merge(@css_files, "#{@out_path}/styles.css", true)}
-      echo "@title = '#{TITLE}';@version = '#{VERSION}';@description = '#{DESCRIPTION}'" > gadget.rb
-      erubis -E PrintOut -l ruby #{@in_path}/manifest.json.erb >> gadget.rb
-      ruby gadget.rb > #{@out_path}/manifest.json
       cp assets/logo* #{@out_path}/
-      rm -f gadget.rb
     END
+
+    File.open("#{@out_path}/manifest.json", "w") do |file|
+      file.write ERB.new(File.read("#{@in_path}/manifest.json.erb")).result
+    end
   end
 
   task :release => :prepare do

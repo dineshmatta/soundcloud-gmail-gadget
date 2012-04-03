@@ -1,15 +1,20 @@
 {
-  "name": "<%= @title %>",
-  "version": "<%= @version %>",
-  "description": "<%= @description %>",
+  "name": "<%= TITLE %>",
+  "version": "<%= VERSION %>",
+  "description": "<%= DESCRIPTION %>",
   "icons": {
     "48" : "logo-48.png",
     "128" : "logo-128.png"
   },
+  "permissions": [
+    "http://soundcloud.com/"
+  ],
   "content_scripts": [ {
     "matches" : [ "https://mail.google.com/mail/u/*/?ui=2&view=bsp*", "https://mail.google.com/mail/?ui=2&view=bsp*" ],
     "js" : ["javascripts.js"],
+    "css" : ["style.css"],
     "run_at": "document_end",
     "all_frames": true
-  } ]
+  } ],
+  "manifest_version" : 2
 }
