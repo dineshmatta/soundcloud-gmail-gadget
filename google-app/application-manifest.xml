@@ -26,7 +26,7 @@
 
   <Extension id="SoundCloudGadget" type="gadget">
     <Name>SoundCloud Sounds in Google Mail\u2122</Name>
-    <Url>https://github.com/soundcloudlabs/soundcloud-gmail-gadget/raw/build/google-app/gadget.xml</Url>
+    <Url>https://raw.github.com/soundcloudlabs/soundcloud-gmail-gadget/gh-pages/google-app/gadget.xml</Url>
     <Container name="mail"/>
   </Extension>
 
