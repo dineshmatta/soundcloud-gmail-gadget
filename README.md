@@ -23,7 +23,7 @@ To deploy, run `rake build_all` which builds all thee components into _build/_. 
 Some useful pages for developing the gadget:
 
 ### Google App
-- [Developers Guide](http://code.google.com/apis/gmail/gadgets/contextual)
+- [Developers Guide](https://developers.google.com/google-apps/gmail/contextual_gadgets)
 - [Publish at Google Market Place](https://www.google.com/enterprise/marketplace/viewVendorProfile)
 - [Active at Google App Dashboard](https://www.google.com/a/cpanel/soundcloud.com/UserHub)
 - [Test GMail without Gadget Cache](https://mail.google.com/mail/u/1/?nogadgetcache=1)
