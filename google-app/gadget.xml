@@ -9501,6 +9501,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
             dataType: options.dataType,
             method: 'POST',
             iframe: true,
+            maxheight: 305,
             data: {
               url: url,
               format: (options.dataType == 'jsonp') ? 'js' : 'json',
@@ -9581,7 +9582,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
           //$output = $('<div />').appendTo($output);
         };
 
-        $output.append('<div class="body"><a href="#" class="show">Show more</a><a href="#">Hide</a></div>');
+        $output.append('<div class="body"><a href="#" class="show">Show more</a><a href="#" class="hide">Hide</a></div>');
         $output.scWidgetify(options.urls, {
           https: true,
           dataType: options.dataType,
@@ -9591,6 +9592,7 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
             if(cnt > options.showDefault) {
               element.hide();
               $output.find('a.show').html('Show ' + (cnt - options.showDefault) + ' more').show();
+              $output.find('a.hide').hide();
             }
             methods.updateHeight($output, options);
           }
@@ -9626,6 +9628,8 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 
 jQuery(document).ready(function() {
   $(document.body).gadgetize({
+    dataType: 'jsonp',
+    showDefault: 1,
     urls: google.contentmatch.getContentMatches(),
     updateHeightCallback: function(height) {
       gadgets.window.adjustHeight(height);
