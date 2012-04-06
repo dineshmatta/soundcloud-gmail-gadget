@@ -190,6 +190,8 @@ task :deploy => :release_all do
     rm -rf firefox
     rm -rf example
     rm -rf google-app
+    rm *.zip
+    rm *.xpi
     git checkout master
   END
 end
