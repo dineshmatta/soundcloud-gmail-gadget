@@ -39,10 +39,7 @@ Some useful pages for developing the gadget:
 
 
 ## Todos
-
-  * check conversation stream
-  * check weird url formats, e.g. containing <wbr>
-
+  none :-)
 
 ## Contributing
 

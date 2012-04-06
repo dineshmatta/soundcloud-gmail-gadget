@@ -23,6 +23,7 @@ gadget = function ($) {
       if( matches && matches.length > 0 ) {
         $(this).parent().parent().find('.hi:first:empty').each( function () {
           $(this).gadgetize({
+            showDefault: 1,
             addTitle: true,
             urls: matches
           });
