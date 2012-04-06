@@ -37,7 +37,7 @@
           //$output = $('<div />').appendTo($output);
         };
 
-        $output.append('<div class="body"><a href="#" class="show">Show more</a><a href="#">Hide</a></div>');
+        $output.append('<div class="body"><a href="#" class="show">Show more</a><a href="#" class="hide">Hide</a></div>');
         $output.scWidgetify(options.urls, {
           https: true,
           dataType: options.dataType,
@@ -47,6 +47,7 @@
             if(cnt > options.showDefault) {
               element.hide();
               $output.find('a.show').html('Show ' + (cnt - options.showDefault) + ' more').show();
+              $output.find('a.hide').hide();
             }
             methods.updateHeight($output, options);
           }
