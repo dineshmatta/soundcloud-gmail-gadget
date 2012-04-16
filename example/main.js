@@ -8,6 +8,8 @@ var extractUrls = function() {
 jQuery(document).ready(function() {
   $("body").gadgetize({
     urls: extractUrls(),
+    showTitle: false,
+    showDefault: 1,
     updateHeightCallback: function(height) {
       console.log("Updated height to "+ height + "px");
     }

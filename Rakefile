@@ -1,7 +1,11 @@
 require 'rake'
 require 'erb'
 
-VENDOR_JS_FILES = %w(http://code.jquery.com/jquery-1.7.2.js https://raw.github.com/rngtng/soundcloud-widgetify/master/sc-widgetify.js)
+VENDOR_JS_FILES = %w(
+  http://code.jquery.com/jquery-1.7.2.js
+  https://raw.github.com/rngtng/soundcloud-widgetify/master/sc-widgetify.js
+  https://github.com/andris9/jStorage/raw/master/jstorage.min.js
+)
 TITLE           = "SoundCloud Sounds in Google Mail\\u2122"
 VERSION         = File.open('VERSION').read.strip
 DESCRIPTION     = "Show SoundCloud Widget for any sound url in Google Mail\\u2122"
@@ -43,7 +47,7 @@ namespace :example do
     @in_path   = task.scope.last
     @out_path  = "build/#{@in_path}"
     @js_files  = vendor_js_files + %W(src/gadgetize.js #{@in_path}/main.js)
-    @css_files = %W(src/style.css)
+    @css_files = %W(google-app/style.css)
   end
 
   desc "Build the Example file"
@@ -66,7 +70,7 @@ namespace 'google-app' do
     @in_path   = task.scope.last
     @out_path  = "build/#{@in_path}"
     @js_files  = vendor_js_files + %W(src/gadgetize.js #{@in_path}/main.js)
-    @css_files = %W(#{@in_path}/style.css src/style.css)
+    @css_files = %W(#{@in_path}/style.css)
   end
 
   desc "Build the gadget and the xml files"
@@ -131,10 +135,12 @@ namespace :firefox do
     END
   end
 
+  desc "Test the gadget"
   task :test => :build do
     cfx "--pkgdir=#{@out_path} test"
   end
 
+  desc "Run the gadget"
   task :run => :build do
     cfx "--pkgdir=#{@out_path} run"
   end

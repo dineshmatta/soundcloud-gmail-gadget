@@ -1,5 +1,10 @@
 # Changes
 
+## 0.3.1
+- added settings panel
+- added option to select display user/track/set/group
+- added option to show/hide comments
+
 ## 0.3
 - updated to SC HTML5 widget
 - make use of oembed

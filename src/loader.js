@@ -24,7 +24,7 @@ gadget = function ($) {
         $(this).parent().parent().find('.hi:first:empty').each( function () {
           $(this).gadgetize({
             showDefault: 1,
-            addTitle: true,
+            showTitle: true,
             urls: matches
           });
         });
