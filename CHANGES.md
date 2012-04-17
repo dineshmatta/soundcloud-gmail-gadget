@@ -1,6 +1,6 @@
 # Changes
 
-## 0.3.2
+## 0.3.3
 - prevent default Events
 - Height fix
 - added option to enable Flash Player

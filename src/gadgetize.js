@@ -13,7 +13,6 @@
         -webkit-perspective: 1000px; \
         -moz-perspective: 1000px; \
       } \
-      .sc-gadget .panel.flipped { min-height: 150px; } \
       .sc-gadget .panel .front { \
         position: absolute; z-index: 900; width: 100%; \
         -webkit-transform: rotateX(0deg); \
@@ -74,8 +73,11 @@
       $output.find('li[data-sc-url]:visible').map(function(i, e){
         height += $(e).data('sc-height') + options.linePadding;
       });
+      if(height < 150 && $output.find('.panel.flipped').length > 0) {
+        height += 150;
+      };
       if(height > 0) {
-        $output.find('.panel,.panel .back').css("height", height);
+        $output.find('.panel,.panel .back').css('height', height);
       };
       if($output.find('a.show:visible,a.hide:visible').length > 0) {
         height += 20;
@@ -123,6 +125,7 @@
         $output.find('a.settings').click(function(event) {
           event.preventDefault();
           $panel.toggleClass('flipped');
+          methods.updateHeight($output, options);
         });
 
         var $panel = $('<div class="panel"></div>').appendTo($output),
@@ -140,7 +143,7 @@
             <ul> \
               <li><input type="checkbox" ' + (options.showComments ? 'checked' : '') + ' id="showComments"><label for="showComments">yes</label></li> \
             </ul> \
-            <b>Shiny new HTML5 Widget (no Flash):</b><br> \
+            <b>Show shiny new HTML5 Widget (aka. no Flash):</b><br> \
             <ul> \
               <li><input type="checkbox" ' + (options.iframe ? 'checked' : '') + ' id="iframe"><label for="iframe">yes</label></li> \
             </ul> \
