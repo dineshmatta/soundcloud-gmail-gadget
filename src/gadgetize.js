@@ -13,7 +13,7 @@
         -webkit-perspective: 1000px; \
         -moz-perspective: 1000px; \
       } \
-      .sc-gadget .panel.flipped { height: 110px; } \
+      .sc-gadget .panel.flipped { min-height: 150px; } \
       .sc-gadget .panel .front { \
         position: absolute; z-index: 900; width: 100%; \
         -webkit-transform: rotateX(0deg); \
@@ -51,6 +51,9 @@
         -webkit-transform: rotateX(0deg); \
         -moz-transform: rotateX(0deg); \
       } \
+      .sc-gadget .panel.flipped object, .sc-gadget .panel.flipped embed { \
+        display: none; \
+      } \
       .sc-gadget .panel .back .settings { \
         padding: 5px; \
       } \
@@ -77,6 +80,9 @@
       if($output.find('a.show:visible,a.hide:visible').length > 0) {
         height += 20;
       };
+      if($output.find('a.settings:visible').length > 0) {
+        height += 20;
+      };
       if($.isFunction(options.updateHeightCallback)) {
         options.updateHeightCallback(height);
       };
@@ -97,6 +103,7 @@
         resolveTrack:    $.jStorage.get("sc:resolveTrack", true),
         resolveGroup:    $.jStorage.get("sc:resolveGroup", true),
         resolvePlaylist: $.jStorage.get("sc:resolvePlaylist", true),
+        iframe:          $.jStorage.get("sc:iframe", true),
         // resolve:         $.jStorage.get("sc:resolve", ['user', 'track', 'group', 'set']),
       }, options);
 
@@ -113,7 +120,8 @@
         }
 
         $output.append('<a class="settings" href="#">settings</a><br>');
-        $output.find('a.settings').click( function() {
+        $output.find('a.settings').click(function(event) {
+          event.preventDefault();
           $panel.toggleClass('flipped');
         });
 
@@ -132,11 +140,16 @@
             <ul> \
               <li><input type="checkbox" ' + (options.showComments ? 'checked' : '') + ' id="showComments"><label for="showComments">yes</label></li> \
             </ul> \
+            <b>Shiny new HTML5 Widget (no Flash):</b><br> \
+            <ul> \
+              <li><input type="checkbox" ' + (options.iframe ? 'checked' : '') + ' id="iframe"><label for="iframe">yes</label></li> \
+            </ul> \
           </div> \
         </div>').appendTo($panel);
 
         $front.append('<a href="#" class="show">Show more</a><a href="#" class="hide">Hide</a>');
-        $front.find('a.show,a.hide').click( function() {
+        $front.find('a.show,a.hide').click(function(event) {
+          event.preventDefault();
           $front.find('a.show,a.hide').toggle();
           $front.find('li[data-sc-url]').slice(options.showDefault).slideToggle("fast", function(){
             methods.updateHeight($output, options);
@@ -152,6 +165,7 @@
           resolvePlaylist: options.resolvePlaylist,
           resolve:         options.resolve,
           dataType:        options.dataType,
+          iframe:          options.iframe,
           callback: function(element, result) {
             var cnt = $front.find('li[data-sc-url]').length;
             $output.find('.title').show();
@@ -164,7 +178,7 @@
           }
         });
 
-        $back.find('input').click( function() {
+        $back.find('input').click(function(event) {
           var $this = $(this);
           $.jStorage.set('sc:' + $this.attr('id'), $this.is(':checked'));
         });
