@@ -32,31 +32,6 @@ body {
   color: #55688A;
 }
 
-
-div.sc-gadget {
-  padding: 0 10px;
-  background: #F2F2F2;
-}
-.sc-gadget .title {
-  font-size: 80%;
-  padding-top: 8px;
-  margin-bottom: 4px;
-}
-.sc-gadget ul {
-  padding: 0;
-  margin: 0;
-}
-.sc-gadget li {
-  list-style-type: none;
-  padding: 0 0 10px 0;
-  margin: 0;
-}
-.sc-gadget a {
-  font-size: 80%;
-  color: #55688A;
-  display: none;
-}
-
     </style>
     <script type="text/javascript">
       /*!
@@ -9474,13 +9449,30 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
  */
 (function($){
   var methods = {
+    urlType : function(iframe) {
+      if (iframe.match(/groups%2F/g)) {
+        return 'group';
+      }
+      if (iframe.match(/playlists%2F/g)) {
+        return 'playlist';
+      }
+      if (iframe.match(/users%2F/g)) {
+        return 'user';
+      }
+      return 'track';
+    },
     /**
      * Main function, iterate over given urls and load & append a widget
      */
     init : function( matches, options ) {
       options = $.extend(true, {
         https: false,
-        dataType: 'jsonp'
+        dataType: 'jsonp',
+        showComments: true,
+        resolveUser: true,
+        resolveTrack: true,
+        resolvePlaylist: true,
+        resolveGroup: true,
       }, options);
 
       /**
@@ -9500,16 +9492,24 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
             url: (options.https ? "https:" : "http:") + "//soundcloud.com/oembed",
             dataType: options.dataType,
             method: 'POST',
-            maxheight: 305,
-            iframe: true,
             data: {
               url: url,
               format: (options.dataType == 'jsonp') ? 'js' : 'json',
+              maxheight: 305,
+              iframe: true,
+              show_comments: options.showComments,
             },
             success: function(result, status, xhr) {
               if( $root.find('li[data-sc-url="' + url + '"]').length == 0 ) { // don't add duplicate URLs
-                var iframe = result.html.replace(/https?/, options.https ? "https" : "http");
-                $node = $('<li data-sc-url="' + url + '" data-sc-height="' + result.height + '">' + iframe + '</li>').appendTo($root);
+                var iframe = result.html.replace(/https?/, options.https ? "https" : "http"),
+                  type = methods.urlType(iframe),
+                  $node = null;
+                if( type == 'user' && options.resolveUser ||
+                    type == 'track' && options.resolveTrack ||
+                    type == 'playlist' && options.resolvePlaylist ||
+                    type == 'group' && options.resolvePlaylist) {
+                  $node = $('<li data-sc-url="' + url + '" data-sc-height="' + result.height + '">' + iframe + '</li>').appendTo($root);
+                };
                 if( $.isFunction(options.callback) ) {
                   options.callback($node, result);
                 }
@@ -9543,19 +9543,97 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
 })(jQuery);
 
 
+(function(g){function m(){if(e.jStorage)try{c=n(""+e.jStorage)}catch(a){e.jStorage="{}"}else e.jStorage="{}";j=e.jStorage?(""+e.jStorage).length:0}function h(){try{e.jStorage=o(c),d&&(d.setAttribute("jStorage",e.jStorage),d.save("jStorage")),j=e.jStorage?(""+e.jStorage).length:0}catch(a){}}function i(a){if(!a||"string"!=typeof a&&"number"!=typeof a)throw new TypeError("Key name must be string or numeric");if("__jstorage_meta"==a)throw new TypeError("Reserved key name");return!0}function k(){var a,
+b,d,e=Infinity,f=!1;clearTimeout(p);if(c.__jstorage_meta&&"object"==typeof c.__jstorage_meta.TTL){a=+new Date;d=c.__jstorage_meta.TTL;for(b in d)d.hasOwnProperty(b)&&(d[b]<=a?(delete d[b],delete c[b],f=!0):d[b]<e&&(e=d[b]));Infinity!=e&&(p=setTimeout(k,e-a));f&&h()}}if(!g||!g.toJSON&&!Object.toJSON&&!window.JSON)throw Error("jQuery, MooTools or Prototype needs to be loaded before jStorage!");var c={},e={jStorage:"{}"},d=null,j=0,o=g.toJSON||Object.toJSON||window.JSON&&(JSON.encode||JSON.stringify),
+n=g.evalJSON||window.JSON&&(JSON.decode||JSON.parse)||function(a){return(""+a).evalJSON()},f=!1,p,l={isXML:function(a){return(a=(a?a.ownerDocument||a:0).documentElement)?"HTML"!==a.nodeName:!1},encode:function(a){if(!this.isXML(a))return!1;try{return(new XMLSerializer).serializeToString(a)}catch(b){try{return a.xml}catch(c){}}return!1},decode:function(a){var b="DOMParser"in window&&(new DOMParser).parseFromString||window.ActiveXObject&&function(a){var b=new ActiveXObject("Microsoft.XMLDOM");b.async=
+"false";b.loadXML(a);return b};if(!b)return!1;a=b.call("DOMParser"in window&&new DOMParser||window,a,"text/xml");return this.isXML(a)?a:!1}};g.jStorage={version:"0.1.6.1",set:function(a,b){i(a);if(l.isXML(b))b={_is_xml:!0,xml:l.encode(b)};else{if("function"==typeof b)return;b&&"object"==typeof b&&(b=n(o(b)))}c[a]=b;h();return b},get:function(a,b){i(a);return a in c?c[a]&&"object"==typeof c[a]&&c[a]._is_xml&&c[a]._is_xml?l.decode(c[a].xml):c[a]:"undefined"==typeof b?null:b},deleteKey:function(a){i(a);
+return a in c?(delete c[a],c.__jstorage_meta&&"object"==typeof c.__jstorage_meta.TTL&&a in c.__jstorage_meta.TTL&&delete c.__jstorage_meta.TTL[a],h(),!0):!1},setTTL:function(a,b){var d=+new Date;i(a);b=Number(b)||0;if(a in c){if(!c.__jstorage_meta)c.__jstorage_meta={};if(!c.__jstorage_meta.TTL)c.__jstorage_meta.TTL={};0<b?c.__jstorage_meta.TTL[a]=d+b:delete c.__jstorage_meta.TTL[a];h();k();return!0}return!1},flush:function(){c={};h();return!0},storageObj:function(){function a(){}a.prototype=c;return new a},
+index:function(){var a=[],b;for(b in c)c.hasOwnProperty(b)&&"__jstorage_meta"!=b&&a.push(b);return a},storageSize:function(){return j},currentBackend:function(){return f},storageAvailable:function(){return!!f},reInit:function(){var a;if(d&&d.addBehavior){a=document.createElement("link");d.parentNode.replaceChild(a,d);d=a;d.style.behavior="url(#default#userData)";document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}";try{a=d.getAttribute("jStorage")}catch(b){}e.jStorage=
+a;f="userDataBehavior"}m()}};(function(){var a=!1;if("localStorage"in window)try{window.localStorage.setItem("_tmptest","tmpval"),a=!0,window.localStorage.removeItem("_tmptest")}catch(b){}if(a)try{if(window.localStorage)e=window.localStorage,f="localStorage"}catch(c){}else if("globalStorage"in window)try{window.globalStorage&&(e=window.globalStorage[window.location.hostname],f="globalStorage")}catch(g){}else if(d=document.createElement("link"),d.addBehavior){d.style.behavior="url(#default#userData)";
+document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}";try{a=d.getAttribute("jStorage")}catch(h){}e.jStorage=a;f="userDataBehavior"}else{d=null;return}m();k()})()})(window.jQuery||window.$);
+
 (function($){
-  var methods = {
+  var styles = ' \
+      div.sc-gadget { padding: 0 10px; font-size: 80%; font-family: arial, sans-serif; background: #F2F2F2; } \
+      .sc-gadget .title { padding-top: 4px; margin-bottom: 8px; display: none;} \
+      .sc-gadget ul { padding: 0; margin: 0; } \
+      .sc-gadget li { list-style-type: none; padding: 0 0 10px 0; margin: 0; } \
+      .sc-gadget a.show, .sc-gadget a.hide { color: #55688A; display: none; } \
+      .sc-gadget a.settings { font-size: 80%; text-align: right; float: right; color: #55688A; } \
+      div.sc-gadget a.settings { font-size: 100%; margin-top:-23px; } \
+      div.sc-gadget br { display: none } \
+      .sc-gadget .panel { \
+        width: 100%; background: #F2F2F2; \
+        -webkit-perspective: 1000px; \
+        -moz-perspective: 1000px; \
+      } \
+      .sc-gadget .panel.flipped { height: 110px; } \
+      .sc-gadget .panel .front { \
+        position: absolute; z-index: 900; width: 100%; \
+        -webkit-transform: rotateX(0deg); \
+        -webkit-transform-style: preserve-3d; \
+        -webkit-backface-visibility: hidden; \
+        -moz-transform: rotateX(0deg); \
+        -moz-transform-style: preserve-3d; \
+        -moz-backface-visibility: hidden; \
+        -o-transition: all .4s ease-in-out; \
+        -ms-transition: all .4s ease-in-out; \
+        -moz-transition: all .4s ease-in-out; \
+        -webkit-transition: all .4s ease-in-out; \
+        transition: all .4s ease-in-out; \
+      } \
+      .sc-gadget .panel.flipped .front { \
+        -webkit-transform: rotateX(-180deg); \
+        -moz-transform: rotateX(-180deg); \
+      } \
+      .sc-gadget .panel .back { \
+        position: absolute; z-index: 800; width: 100%; background: #F2F2F2; \
+        -webkit-transform: rotateX(180deg); \
+        -webkit-transform-style: preserve-3d; \
+        -webkit-backface-visibility: hidden; \
+        -moz-transform: rotateX(180deg); \
+        -moz-transform-style: preserve-3d; \
+        -moz-backface-visibility: hidden; \
+        -o-transition: all .4s ease-in-out; \
+        -ms-transition: all .4s ease-in-out; \
+        -moz-transition: all .4s ease-in-out; \
+        -webkit-transition: all .4s ease-in-out; \
+        transition: all .4s ease-in-out; \
+      } \
+      .sc-gadget .panel.flipped .back { \
+        z-index: 1000; \
+        -webkit-transform: rotateX(0deg); \
+        -moz-transform: rotateX(0deg); \
+      } \
+      .sc-gadget .panel .back .settings { \
+        padding: 5px; \
+      } \
+      .sc-gadget .panel .back ul { \
+        padding: 5px 0 15px 20px; \
+      } \
+      .sc-gadget .panel .back li { \
+        padding: 0; \
+        padding-right: 10px; \
+        display: inline; \
+      } \
+      .sc-gadget .panel .back label { \
+        padding-left: 5px; \
+      }',
+    methods = {
     updateHeight : function($output, options) {
       var height = 0;
-      if($output.find('a:visible').length > 0) {
-        height += 15;
-      }
       $output.find('li[data-sc-url]:visible').map(function(i, e){
         height += $(e).data('sc-height') + options.linePadding;
       });
+      if(height > 0) {
+        $output.find('.panel,.panel .back').css("height", height);
+      };
+      if($output.find('a.show:visible,a.hide:visible').length > 0) {
+        height += 20;
+      };
       if($.isFunction(options.updateHeightCallback)) {
-        options.updateHeightCallback(height)
-      }
+        options.updateHeightCallback(height);
+      };
     },
 
     /**
@@ -9563,11 +9641,17 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
      */
     init : function( options ) {
       options = $.extend(true, {
-        urls: [],
-        addTitle: false,
-        showDefault: 3,
-        linePadding: 15,
-        dataType: 'json',
+        urls:            [],
+        showTitle:       false,
+        showDefault:     $.jStorage.get("sc:showDefault", 3),
+        linePadding:     15,
+        dataType:        'json',
+        showComments:    $.jStorage.get("sc:showComments", true),
+        resolveUser:     $.jStorage.get("sc:resolveUser", true),
+        resolveTrack:    $.jStorage.get("sc:resolveTrack", true),
+        resolveGroup:    $.jStorage.get("sc:resolveGroup", true),
+        resolvePlaylist: $.jStorage.get("sc:resolvePlaylist", true),
+        // resolve:         $.jStorage.get("sc:resolve", ['user', 'track', 'group', 'set']),
       }, options);
 
       /**
@@ -9576,33 +9660,67 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
       return this.each(function() {
         var $output = $(this);
 
-        if (options.addTitle) {
-          $('<style>div.sc-gadget { padding: 0 10px; background: #F2F2F2; } .sc-gadget .title { font-size: 80%; padding-top: 8px; margin-bottom: 4px; display: none;} .sc-gadget ul { padding: 0; margin: 0; } .sc-gadget li { list-style-type: none; padding: 0 0 10px 0; margin: 0; } .sc-gadget a { font-size: 80%; color: #55688A; display: none; } </style>').appendTo($output);
-          $output = $('<div class="sc-gadget"><div class="title"><b>SoundCloud</b> - Sounds from this email</div></div>').appendTo($output);
-          //$output = $('<div />').appendTo($output);
-        };
+        $output.append('<style>' + styles + '</style>');
 
-        $output.append('<div class="body"><a href="#" class="show">Show more</a><a href="#" class="hide">Hide</a></div>');
-        $output.scWidgetify(options.urls, {
-          https: true,
-          dataType: options.dataType,
+        if (options.showTitle) {
+          $output = $('<div class="sc-gadget"><div class="title"><b>SoundCloud</b> - Sounds from this email</div></div>').appendTo($output);
+        }
+
+        $output.append('<a class="settings" href="#">settings</a><br>');
+        $output.find('a.settings').click( function() {
+          $panel.toggleClass('flipped');
+        });
+
+        var $panel = $('<div class="panel"></div>').appendTo($output),
+        $front = $('<div class="front"></div>').appendTo($panel),
+        $back = $('<div class="back">\
+          <div class="settings">\
+            <b>Show SoundCloud Widget for:</b><br> \
+            <ul> \
+             <li><input type="checkbox" ' + (options.resolveUser     ? 'checked' : '') + ' id="resolveUser" ><label for="resolveUser">User</label></li> \
+             <li><input type="checkbox" ' + (options.resolveTrack    ? 'checked' : '') + ' id="resolveTrack"><label for="resolveTrack">Track</label></li> \
+             <li><input type="checkbox" ' + (options.resolvePlaylist ? 'checked' : '') + ' id="resolvePlaylist" ><label for="resolvePlaylist">Set</label></li> \
+             <li><input type="checkbox" ' + (options.resolveGroup    ? 'checked' : '') + ' id="resolveGroup"><label for="resolveGroup">Group</label></li> \
+            </ul> \
+            <b>Show Comments:</b><br> \
+            <ul> \
+              <li><input type="checkbox" ' + (options.showComments ? 'checked' : '') + ' id="showComments"><label for="showComments">yes</label></li> \
+            </ul> \
+          </div> \
+        </div>').appendTo($panel);
+
+        $front.append('<a href="#" class="show">Show more</a><a href="#" class="hide">Hide</a>');
+        $front.find('a.show,a.hide').click( function() {
+          $front.find('a.show,a.hide').toggle();
+          $front.find('li[data-sc-url]').slice(options.showDefault).slideToggle("fast", function(){
+            methods.updateHeight($output, options);
+          });
+        });
+
+        $front.scWidgetify(options.urls, {
+          https:           true,
+          showComments:    options.showComments,
+          resolveUser:     options.resolveUser,
+          resolveTrack:    options.resolveTrack,
+          resolveGroup:    options.resolveGroup,
+          resolvePlaylist: options.resolvePlaylist,
+          resolve:         options.resolve,
+          dataType:        options.dataType,
           callback: function(element, result) {
-            var cnt = $output.find('li[data-sc-url]').length;
+            var cnt = $front.find('li[data-sc-url]').length;
             $output.find('.title').show();
             if(cnt > options.showDefault) {
               element.hide();
-              $output.find('a.show').html('Show ' + (cnt - options.showDefault) + ' more').show();
-              $output.find('a.hide').hide();
+              $front.find('a.show').html('Show ' + (cnt - options.showDefault) + ' more').show();
+              $front.find('a.hide').hide();
             }
             methods.updateHeight($output, options);
           }
         });
 
-        $output.find('a').click( function() {
-          $output.find('a').toggle()
-          $output.find('li[data-sc-url]').slice(options.showDefault).slideToggle("fast", function(){
-            methods.updateHeight($output, options);
-          });
+        $back.find('input').click( function() {
+          var $this = $(this);
+          $.jStorage.set('sc:' + $this.attr('id'), $this.is(':checked'));
         });
       });
     }
