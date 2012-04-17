@@ -1,5 +1,10 @@
 # Changes
 
+## 0.3.2
+- prevent default Events
+- Height fix
+- added option to enable Flash Player
+
 ## 0.3.1
 - added settings panel
 - added option to select display user/track/set/group

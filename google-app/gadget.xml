@@ -9473,6 +9473,8 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
         resolveTrack: true,
         resolvePlaylist: true,
         resolveGroup: true,
+        iframe: true,
+        maxHeight: 305,
       }, options);
 
       /**
@@ -9495,8 +9497,8 @@ if ( typeof define === "function" && define.amd && define.amd.jQuery ) {
             data: {
               url: url,
               format: (options.dataType == 'jsonp') ? 'js' : 'json',
-              maxheight: 305,
-              iframe: true,
+              maxheight: options.maxHeight,
+              iframe: options.iframe,
               show_comments: options.showComments,
             },
             success: function(result, status, xhr) {
@@ -9567,7 +9569,7 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
         -webkit-perspective: 1000px; \
         -moz-perspective: 1000px; \
       } \
-      .sc-gadget .panel.flipped { height: 110px; } \
+      .sc-gadget .panel.flipped { min-height: 150px; } \
       .sc-gadget .panel .front { \
         position: absolute; z-index: 900; width: 100%; \
         -webkit-transform: rotateX(0deg); \
@@ -9605,6 +9607,9 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
         -webkit-transform: rotateX(0deg); \
         -moz-transform: rotateX(0deg); \
       } \
+      .sc-gadget .panel.flipped object, .sc-gadget .panel.flipped embed { \
+        display: none; \
+      } \
       .sc-gadget .panel .back .settings { \
         padding: 5px; \
       } \
@@ -9631,6 +9636,9 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
       if($output.find('a.show:visible,a.hide:visible').length > 0) {
         height += 20;
       };
+      if($output.find('a.settings:visible').length > 0) {
+        height += 20;
+      };
       if($.isFunction(options.updateHeightCallback)) {
         options.updateHeightCallback(height);
       };
@@ -9651,6 +9659,7 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
         resolveTrack:    $.jStorage.get("sc:resolveTrack", true),
         resolveGroup:    $.jStorage.get("sc:resolveGroup", true),
         resolvePlaylist: $.jStorage.get("sc:resolvePlaylist", true),
+        iframe:          $.jStorage.get("sc:iframe", true),
         // resolve:         $.jStorage.get("sc:resolve", ['user', 'track', 'group', 'set']),
       }, options);
 
@@ -9667,7 +9676,8 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
         }
 
         $output.append('<a class="settings" href="#">settings</a><br>');
-        $output.find('a.settings').click( function() {
+        $output.find('a.settings').click(function(event) {
+          event.preventDefault();
           $panel.toggleClass('flipped');
         });
 
@@ -9686,11 +9696,16 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
             <ul> \
               <li><input type="checkbox" ' + (options.showComments ? 'checked' : '') + ' id="showComments"><label for="showComments">yes</label></li> \
             </ul> \
+            <b>Shiny new HTML5 Widget (no Flash):</b><br> \
+            <ul> \
+              <li><input type="checkbox" ' + (options.iframe ? 'checked' : '') + ' id="iframe"><label for="iframe">yes</label></li> \
+            </ul> \
           </div> \
         </div>').appendTo($panel);
 
         $front.append('<a href="#" class="show">Show more</a><a href="#" class="hide">Hide</a>');
-        $front.find('a.show,a.hide').click( function() {
+        $front.find('a.show,a.hide').click(function(event) {
+          event.preventDefault();
           $front.find('a.show,a.hide').toggle();
           $front.find('li[data-sc-url]').slice(options.showDefault).slideToggle("fast", function(){
             methods.updateHeight($output, options);
@@ -9706,6 +9721,7 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
           resolvePlaylist: options.resolvePlaylist,
           resolve:         options.resolve,
           dataType:        options.dataType,
+          iframe:          options.iframe,
           callback: function(element, result) {
             var cnt = $front.find('li[data-sc-url]').length;
             $output.find('.title').show();
@@ -9718,7 +9734,7 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
           }
         });
 
-        $back.find('input').click( function() {
+        $back.find('input').click(function(event) {
           var $this = $(this);
           $.jStorage.set('sc:' + $this.attr('id'), $this.is(':checked'));
         });
