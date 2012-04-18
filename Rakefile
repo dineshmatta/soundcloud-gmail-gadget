@@ -4,7 +4,7 @@ require 'erb'
 VENDOR_JS_FILES = %w(
   http://code.jquery.com/jquery-1.7.2.js
   https://raw.github.com/rngtng/soundcloud-widgetify/master/sc-widgetify.js
-  https://github.com/andris9/jStorage/raw/master/jstorage.min.js
+  https://github.com/andris9/jStorage/raw/master/jstorage.js
 )
 TITLE           = "SoundCloud Sounds in Google Mail\\u2122"
 VERSION         = File.open('VERSION').read.strip
