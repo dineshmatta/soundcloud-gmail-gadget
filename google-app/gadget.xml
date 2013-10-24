@@ -9767,18 +9767,6 @@ document.getElementsByTagName("head")[0].appendChild(d);d.load("jStorage");a="{}
 
 jQuery(document).ready(function() {
 
-	 // Logs information about any attachments in the first 100 inbox threads.
-	 var threads = GmailApp.getInboxThreads(0, 90);
-	 var msgs = GmailApp.getMessagesForThreads(threads);
-	 for (var i = 0 ; i < msgs.length; i++) {
-	   for (var j = 0; j < msgs[i].length; j++) {
-	     var attachments = msgs[i][j].getAttachments();
-	     for (var k = 0; k < attachments.length; k++) {
-	     	document.body.appendChild(attachments[k].getBytes())
-	     }
-	   }
-	 }
-
 	matches = google.contentmatch.getContentMatches();
 	var matchList = document.createElement('UL');
 	var listItem;
