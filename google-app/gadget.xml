@@ -12,7 +12,7 @@
     <Require feature="dynamic-height"/>
     <Require feature="google.contentmatch">
       <Param name="extractors">
-        google.com:HelloWorld
+        google.com:HelloWorld,google.com:MessageIDExtractor
       </Param>
     </Require>
   </ModulePrefs>
