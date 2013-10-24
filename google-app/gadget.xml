@@ -23,7 +23,7 @@
 	      <script type="text/javascript">
 
 	        <!-- Fetch the array of content matches. -->
-	        matches = $wnd.google.contentmatch.getContentMatches();
+	        matches = google.contentmatch.getContentMatches();
 	        var matchList = document.createElement('UL');
 	        var listItem;
 	        var extractedText;
